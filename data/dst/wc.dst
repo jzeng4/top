@@ -1,0 +1,5 @@
+08050460 optind
+08050464 stderr
+08050468 stdin
+08050480 stdout
+08050484 optarg

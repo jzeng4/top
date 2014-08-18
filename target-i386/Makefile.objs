@@ -1,0 +1,15 @@
+obj-y += translate.o helper.o cpu.o
+obj-y += excp_helper.o fpu_helper.o cc_helper.o int_helper.o svm_helper.o
+obj-y += smm_helper.o misc_helper.o mem_helper.o seg_helper.o
+obj-y += gdbstub.o
+
+
+#yang
+obj-y += qemu-pemu.o
+obj-y += rev_inline/helper_hook_inst.o rev_inline/hook_inst.o rev_inline/inline_inst.o rev_inline/inst_interface.o  rev_inline/patch_inst.o rev_inline/data_rewrite.o rev_inline/data_taint.o rev_inline/txt_rewrite.o rev_inline/print_inst.o  rev_inline/txt_taint.o rev_inline/linux.o
+
+obj-$(CONFIG_SOFTMMU) += machine.o arch_memory_mapping.o arch_dump.o
+obj-$(CONFIG_KVM) += kvm.o hyperv.o
+obj-$(CONFIG_NO_KVM) += kvm-stub.o
+obj-$(CONFIG_LINUX_USER) += ioport-user.o
+obj-$(CONFIG_BSD_USER) += ioport-user.o

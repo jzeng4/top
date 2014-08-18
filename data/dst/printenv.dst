@@ -1,0 +1,7 @@
+0804e380 optind
+0804e384 stderr
+0804e3a0 environ
+0804e3a0 _environ
+0804e3c0 stdout
+0804e3c4 opterr
+0804e3a0 __environ

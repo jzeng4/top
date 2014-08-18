@@ -1,0 +1,350 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+API_CALL	cpptoc.h	/^}API_CALL;$/;"	t	typeref:struct:_API_CALL
+API_IMP	cpptoc.h	/^	API_IMP = 1,$/;"	e	enum:_API_TPYE
+API_NONE	cpptoc.h	/^	API_NONE = 0,$/;"	e	enum:_API_TPYE
+API_REG	cpptoc.h	/^	API_REG = 2$/;"	e	enum:_API_TPYE
+API_TYPE	cpptoc.h	/^}API_TYPE;$/;"	t	typeref:enum:_API_TPYE
+Addr	data_taint.h	/^typedef  unsigned int Addr;$/;"	t
+Addr	txt_taint.h	/^typedef  unsigned int Addr;$/;"	t
+CALL	cpptoc.h	/^	CALL,$/;"	e	enum:_INST_TYPE
+CHGAPICALL	cpptoc.h	/^	CHGAPICALL,$/;"	e	enum:_INST_TYPE
+CONFIG__H__	config.h	2;"	d
+CPLT	cpptoc.h	/^	CPLT,$/;"	e	enum:_INST_TYPE
+CPPTOC_H	cpptoc.h	2;"	d
+Char	data_taint.h	/^typedef    signed char   Char;$/;"	t
+Char	txt_taint.h	/^typedef    signed char   Char;$/;"	t
+ControlFunc	txt_rewrite.h	/^typedef void (*ControlFunc)(const xed_inst_t*);$/;"	t
+DATA_REWRITE_H	data_rewrite.h	2;"	d
+DataFunc	data_rewrite.h	/^typedef void (*DataFunc)(const xed_inst_t*);$/;"	t
+ELEM	inline_inst.cpp	/^}ELEM;$/;"	t	typeref:struct:__anon4	file:
+ENSURE_MAPPABLE	data_taint.c	25;"	d	file:
+ENSURE_MAPPABLE	txt_taint.c	25;"	d	file:
+ENSURE_MAPPABLE_BYTE_GRANUITY	data_taint.c	32;"	d	file:
+ENSURE_MAPPABLE_BYTE_GRANUITY	txt_taint.c	32;"	d	file:
+FDTAINTED	data_taint.h	19;"	d
+FDTAINTED	txt_taint.h	19;"	d
+FUNCTION	inline_inst.h	/^typedef map<unsigned int, INST*> FUNCTION;$/;"	t
+HChar	data_taint.h	/^typedef           char   HChar; \/* signfulness depends on host *\/$/;"	t
+HChar	txt_taint.h	/^typedef           char   HChar; \/* signfulness depends on host *\/$/;"	t
+HELPER_HOOK_INST_H	helper_hook_inst.h	2;"	d
+HOOK_INST_H	hook_inst.h	3;"	d
+INCALL	cpptoc.h	/^	INCALL,$/;"	e	enum:_INST_TYPE
+INJMP	cpptoc.h	/^	INJMP,$/;"	e	enum:_INST_TYPE
+INLINE_DICT_H	inline_inst.h	2;"	d
+INS	hook_inst.h	/^typedef const xed_inst_t * INS;$/;"	t
+INST	cpptoc.h	/^}INST;$/;"	t	typeref:struct:_INST
+INST_INTERFACE_H	inst_interface.h	2;"	d
+INST_TYPE	cpptoc.h	/^}INST_TYPE;$/;"	t	typeref:enum:_INST_TYPE
+IS_DISTINGUISHED_SM	data_taint.c	22;"	d	file:
+IS_DISTINGUISHED_SM	txt_taint.c	22;"	d	file:
+Instrument	hook_inst.c	/^void Instrument(INS ins){$/;"	f
+InstrumentFunction	hook_inst.h	/^typedef void (*InstrumentFunction)(INS ins);$/;"	t
+Instrument_ADD	data_rewrite.cpp	/^static void Instrument_ADD(const xed_inst_t* xi)$/;"	f	file:
+Instrument_ADD	txt_rewrite.cpp	/^static void Instrument_ADD(const xed_inst_t* xi)$/;"	f	file:
+Instrument_CALL	data_rewrite.cpp	/^static void Instrument_CALL(const xed_inst_t* xi)$/;"	f	file:
+Instrument_CALL	hook_inst.c	/^static void Instrument_CALL(INS xi)$/;"	f	file:
+Instrument_CALL	txt_rewrite.cpp	/^static void Instrument_CALL(const xed_inst_t* xi)$/;"	f	file:
+Instrument_JMP	data_rewrite.cpp	/^static void Instrument_JMP(const xed_inst_t* xi)$/;"	f	file:
+Instrument_JMP	hook_inst.c	/^static void Instrument_JMP(INS xi)$/;"	f	file:
+Instrument_JMP	txt_rewrite.cpp	/^static void Instrument_JMP(const xed_inst_t* xi)$/;"	f	file:
+Instrument_JMP_FAR	hook_inst.c	/^static void Instrument_JMP_FAR(INS xi)$/;"	f	file:
+Instrument_Jcc	hook_inst.c	/^static void Instrument_Jcc(INS xi)$/;"	f	file:
+Instrument_LEA	data_rewrite.cpp	/^static void Instrument_LEA(const xed_inst_t* xi)$/;"	f	file:
+Instrument_LEA	hook_inst.c	/^static void Instrument_LEA(INS xi)$/;"	f	file:
+Instrument_LEA	txt_rewrite.cpp	/^static void Instrument_LEA(const xed_inst_t* xi)$/;"	f	file:
+Instrument_LEAVE	data_rewrite.cpp	/^static void Instrument_LEAVE(const xed_inst_t* xi)$/;"	f	file:
+Instrument_LEAVE	txt_rewrite.cpp	/^static void Instrument_LEAVE(const xed_inst_t* xi)$/;"	f	file:
+Instrument_Loop	hook_inst.c	/^static void Instrument_Loop(INS  xi)$/;"	f	file:
+Instrument_MOV	data_rewrite.cpp	/^static void Instrument_MOV(const xed_inst_t* xi)$/;"	f	file:
+Instrument_MOV	txt_rewrite.cpp	/^static void Instrument_MOV(const xed_inst_t* xi)$/;"	f	file:
+Instrument_PC1	inst_interface.c	/^void Instrument_PC1(uint8_t* buf){$/;"	f
+Instrument_POP	data_rewrite.cpp	/^static void Instrument_POP(const xed_inst_t* xi)$/;"	f	file:
+Instrument_POP	txt_rewrite.cpp	/^static void Instrument_POP(const xed_inst_t* xi)$/;"	f	file:
+Instrument_POPAD	data_rewrite.cpp	/^static void Instrument_POPAD(const xed_inst_t *xi)$/;"	f	file:
+Instrument_POPAD	txt_rewrite.cpp	/^static void Instrument_POPAD(const xed_inst_t *xi)$/;"	f	file:
+Instrument_PUSH	data_rewrite.cpp	/^static void Instrument_PUSH(const xed_inst_t* xi)$/;"	f	file:
+Instrument_PUSH	txt_rewrite.cpp	/^static void Instrument_PUSH(const xed_inst_t* xi)$/;"	f	file:
+Instrument_PUSHAD	data_rewrite.cpp	/^static void Instrument_PUSHAD(const xed_inst_t *xi)$/;"	f	file:
+Instrument_PUSHAD	txt_rewrite.cpp	/^static void Instrument_PUSHAD(const xed_inst_t *xi)$/;"	f	file:
+Instrument_RET	hook_inst.c	/^static void Instrument_RET(INS xi)$/;"	f	file:
+Instrument_XCHG	data_rewrite.cpp	/^static void Instrument_XCHG(const xed_inst_t *xi)$/;"	f	file:
+Instrument_XCHG	txt_rewrite.cpp	/^static void Instrument_XCHG(const xed_inst_t *xi)$/;"	f	file:
+Instrument_XOR	data_rewrite.cpp	/^static void Instrument_XOR(const xed_inst_t* xi)$/;"	f	file:
+Instrument_XOR	txt_rewrite.cpp	/^static void Instrument_XOR(const xed_inst_t* xi)$/;"	f	file:
+Int	data_taint.h	/^typedef    signed int    Int;$/;"	t
+Int	txt_taint.h	/^typedef    signed int    Int;$/;"	t
+JCC	cpptoc.h	/^	JCC,$/;"	e	enum:_INST_TYPE
+JCC_DEST	cpptoc.h	/^}JCC_DEST;$/;"	t	typeref:struct:__anon3
+JMP	cpptoc.h	/^	JMP,$/;"	e	enum:_INST_TYPE
+JPLT	cpptoc.h	/^	JPLT,$/;"	e	enum:_INST_TYPE
+LEA_16	cpptoc.h	/^	LEA_16,$/;"	e	enum:_INST_TYPE
+LEA_32	cpptoc.h	/^	LEA_32,$/;"	e	enum:_INST_TYPE
+LEA_8	cpptoc.h	/^	LEA_8,$/;"	e	enum:_INST_TYPE
+LOOP	cpptoc.h	/^	LOOP$/;"	e	enum:_INST_TYPE
+Libc_item	linux.h	/^}Libc_item;$/;"	t	typeref:struct:_Libc_item
+NONE	data_rewrite.cpp	/^static void NONE(const xed_inst_t* xi)$/;"	f	file:
+NONE	txt_rewrite.cpp	/^static void NONE(const xed_inst_t* xi)$/;"	f	file:
+NORMAL	cpptoc.h	/^	NORMAL = 0,$/;"	e	enum:_INST_TYPE
+PAGE_BITS	data_taint.c	18;"	d	file:
+PAGE_BITS	txt_taint.c	18;"	d	file:
+PAGE_NUM	data_taint.c	20;"	d	file:
+PAGE_NUM	txt_taint.c	20;"	d	file:
+PAGE_SIZE	data_taint.c	19;"	d	file:
+PAGE_SIZE	txt_taint.c	19;"	d	file:
+PATCH_INST_H	patch_inst.h	2;"	d
+PEMU_binary_name	linux.cpp	/^char PEMU_binary_name[100];$/;"	v
+PEMU_cr3	linux.cpp	/^uint32_t PEMU_cr3 = 0;$/;"	v
+PEMU_find_mmap	linux.cpp	/^int PEMU_find_mmap(uint32_t nextaddr)$/;"	f
+PEMU_find_process	linux.cpp	/^int PEMU_find_process(void *opaque)$/;"	f
+PEMU_g_pc	linux.cpp	/^uint32_t PEMU_g_pc = 0;$/;"	v
+PEMU_get_reg	qemu-pemu.c	/^uint32_t PEMU_get_reg(xed_reg_enum_t reg_id)$/;"	f
+PEMU_img_end	linux.cpp	/^uint32_t PEMU_img_end = 0;$/;"	v
+PEMU_img_start	linux.cpp	/^uint32_t PEMU_img_start = 0;$/;"	v
+PEMU_libc_end	linux.cpp	/^uint32_t PEMU_libc_end = 0;$/;"	v
+PEMU_libc_start	linux.cpp	/^uint32_t PEMU_libc_start = 0;$/;"	v
+PEMU_main_start	linux.cpp	/^uint32_t PEMU_main_start = 0;$/;"	v
+PEMU_read_mem	qemu-pemu.c	/^int PEMU_read_mem(uint32_t vaddr, int len, void *buf)$/;"	f
+PEMU_so_name	linux.cpp	/^char PEMU_so_name[100];$/;"	v
+PEMU_start	linux.cpp	/^uint32_t PEMU_start = 0;$/;"	v
+PEMU_task_addr	linux.cpp	/^uint32_t PEMU_task_addr = 0;$/;"	v
+PEMU_txt_end	linux.cpp	/^uint32_t PEMU_txt_end = 0;$/;"	v
+PEMU_txt_start	linux.cpp	/^uint32_t PEMU_txt_start = 0;$/;"	v
+PRINT_INST_H	print_inst.h	2;"	d
+PROGRAM	inline_inst.h	/^typedef map<unsigned int, FUNCTION*> PROGRAM;$/;"	t
+QEMU_PEMU_H	qemu-pemu.h	2;"	d
+STATISTICS	config.h	8;"	d
+SecMap	data_taint.c	/^} SecMap;$/;"	t	typeref:struct:__anon2	file:
+SecMap	txt_taint.c	/^} SecMap;$/;"	t	typeref:struct:__anon1	file:
+Short	data_taint.h	/^typedef    signed short  Short;$/;"	t
+Short	txt_taint.h	/^typedef    signed short  Short;$/;"	t
+TAIL	cpptoc.h	/^	TAIL,$/;"	e	enum:_INST_TYPE
+TAINTED	data_taint.h	17;"	d
+TAINTED	txt_taint.h	17;"	d
+TTYPE	data_rewrite.cpp	/^}TTYPE;$/;"	t	typeref:struct:_TYPE	file:
+TTYPE	print_inst.cpp	/^}TTYPE;$/;"	t	typeref:struct:_TYPE	file:
+TXTFunc	txt_rewrite.h	/^typedef void (*TXTFunc)(const xed_inst_t*);$/;"	t
+TXT_REWRITE_H	txt_rewrite.h	2;"	d
+UChar	data_taint.h	/^typedef  unsigned char   UChar;$/;"	t
+UChar	txt_taint.h	/^typedef  unsigned char   UChar;$/;"	t
+UINT	data_taint.h	/^typedef  unsigned int    UINT;$/;"	t
+UINT	txt_taint.h	/^typedef  unsigned int    UINT;$/;"	t
+UInt	data_taint.h	/^typedef  unsigned int    UInt;$/;"	t
+UInt	txt_taint.h	/^typedef  unsigned int    UInt;$/;"	t
+UNTAINTED	data_taint.h	18;"	d
+UNTAINTED	txt_taint.h	18;"	d
+UShort	data_taint.h	/^typedef  unsigned short  UShort;$/;"	t
+UShort	txt_taint.h	/^typedef  unsigned short  UShort;$/;"	t
+UnimplementedInstruction	hook_inst.c	/^static void UnimplementedInstruction(INS ins) {$/;"	f	file:
+VGM_BYTE_INVALID	data_taint.h	16;"	d
+VGM_BYTE_INVALID	txt_taint.h	16;"	d
+_API_CALL	cpptoc.h	/^typedef struct _API_CALL{$/;"	s
+_API_TPYE	cpptoc.h	/^typedef enum _API_TPYE{$/;"	g
+_INST	cpptoc.h	/^typedef struct _INST{$/;"	s
+_INST_TYPE	cpptoc.h	/^typedef enum _INST_TYPE{$/;"	g
+_Libc_item	linux.h	/^typedef struct _Libc_item{$/;"	s
+_TYPE	data_rewrite.cpp	/^typedef struct _TYPE{$/;"	s	file:
+_TYPE	print_inst.cpp	/^typedef struct _TYPE{$/;"	s	file:
+__DATA_TAINT_H	data_taint.h	14;"	d
+__LINUX_H__	linux.h	2;"	d
+__TXT_TAINT_H	txt_taint.h	14;"	d
+alloc_secondary_map	data_taint.c	/^static SecMap* alloc_secondary_map ()$/;"	f	file:
+alloc_secondary_map	txt_taint.c	/^static SecMap* alloc_secondary_map ()$/;"	f	file:
+api_call	cpptoc.h	/^	API_CALL api_call;	$/;"	m	struct:_INST
+api_call	data_rewrite.cpp	/^	API_CALL api_call;$/;"	m	struct:_TYPE	file:
+api_call	print_inst.cpp	/^	API_CALL api_call;$/;"	m	struct:_TYPE	file:
+api_copy	helper_hook_inst.c	/^inline void api_copy(API_CALL *to, API_CALL *from)$/;"	f
+byte	data_taint.c	/^   UInt byte[PAGE_SIZE];$/;"	m	struct:__anon2	file:
+byte	txt_taint.c	/^   UInt byte[PAGE_SIZE];$/;"	m	struct:__anon1	file:
+commoffset	linux.cpp	/^int commoffset = 0;$/;"	v
+commsize	linux.cpp	/^int commsize = 0;$/;"	v
+create_func1	inline_inst.cpp	/^FUNCTION *create_func1(unsigned int pc)$/;"	f
+create_inst	inline_inst.cpp	/^INST *create_inst()$/;"	f
+create_program	inline_inst.cpp	/^void create_program(unsigned int pc)$/;"	f
+d_free_shadow_memory	data_taint.c	/^void d_free_shadow_memory(void)$/;"	f
+d_get_mem_taint	data_taint.c	/^UInt  d_get_mem_taint( Addr a )$/;"	f
+d_get_reg_taint	data_taint.c	/^UInt d_get_reg_taint(xed_reg_enum_t reg)$/;"	f
+d_set_mem_taint	data_taint.c	/^void  d_set_mem_taint( Addr a, UInt pc)$/;"	f
+d_set_mem_taint_bysize	data_taint.c	/^void  d_set_mem_taint_bysize( Addr a, UInt pc, UInt size)$/;"	f
+d_set_reg_taint	data_taint.c	/^void d_set_reg_taint(xed_reg_enum_t reg, UInt bytes)$/;"	f
+d_taintInit	data_taint.c	/^void d_taintInit()$/;"	f
+data_func	data_rewrite.cpp	/^static DataFunc data_func[XED_ICLASS_LAST];$/;"	v	file:
+dentryoffset	linux.cpp	/^int dentryoffset = 0;$/;"	v
+dinameoffset	linux.cpp	/^int dinameoffset = 0;$/;"	v
+distinguished_secondary_map	data_taint.c	/^static SecMap distinguished_secondary_map;$/;"	v	file:
+distinguished_secondary_map	txt_taint.c	/^static SecMap distinguished_secondary_map;$/;"	v	file:
+dnameoffset	linux.cpp	/^int dnameoffset = 0;$/;"	v
+dptr	cpptoc.h	/^	unsigned int dptr;		\/\/data pointer$/;"	m	struct:_API_CALL
+dst	cpptoc.h	/^	unsigned int dst;$/;"	m	struct:__anon3
+dstate	inst_interface.c	/^xed_state_t dstate;$/;"	v
+dump_dependence_data	txt_rewrite.cpp	/^unsigned int dump_dependence_data(FILE *output)$/;"	f
+file_name	inst_interface.c	/^char file_name[100];$/;"	v
+find_main_function	linux.cpp	/^void find_main_function(unsigned int pc)$/;"	f
+fname	cpptoc.h	/^	char *fname;$/;"	m	struct:_API_CALL
+format_direct_call	print_inst.cpp	/^static void format_direct_call(const xed_inst_t *xi)$/;"	f	file:
+format_jcc	print_inst.cpp	/^static int format_jcc(const xed_inst_t *xi)$/;"	f	file:
+format_jmp	print_inst.cpp	/^static void format_jmp(const xed_inst_t *xi)$/;"	f	file:
+format_lea	print_inst.cpp	/^static void format_lea(const xed_inst_t *xi)$/;"	f	file:
+format_normal	print_inst.cpp	/^static void format_normal(const xed_inst_t *xi)$/;"	f	file:
+format_reg	print_inst.cpp	35;"	d	file:
+func	inline_inst.cpp	/^	FUNCTION* func;$/;"	m	struct:__anon4	file:
+g_call_num	print_inst.cpp	/^static uint32_t g_call_num;$/;"	v	file:
+g_callstack	inline_inst.cpp	/^stack<ELEM*> g_callstack;$/;"	v
+g_check_nums	print_inst.cpp	/^unsigned int g_check_nums = 0;$/;"	v
+g_count	data_rewrite.cpp	/^static uint32_t g_count = 0;$/;"	v	file:
+g_current_func	inline_inst.cpp	/^FUNCTION *g_current_func;$/;"	v
+g_current_program	inline_inst.cpp	/^PROGRAM *g_current_program;$/;"	v
+g_dependence_base	print_inst.cpp	/^unsigned int g_dependence_base;$/;"	v
+g_dis_nums	print_inst.cpp	/^unsigned int g_dis_nums = 0;$/;"	v
+g_dump_data	print_inst.cpp	/^static uint32_t g_dump_data;$/;"	v	file:
+g_imm_nums	print_inst.cpp	/^unsigned int g_imm_nums = 0;$/;"	v
+g_inst_buffer	inst_interface.c	/^char g_inst_buffer[15];$/;"	v
+g_inst_name	hook_inst.c	/^char g_inst_name[1024];$/;"	v
+g_inst_num	print_inst.cpp	/^static uint32_t g_inst_num;$/;"	v	file:
+g_inst_str	inst_interface.c	/^char g_inst_str[500];$/;"	v
+g_is_printed	inst_interface.c	/^uint32_t g_is_printed;$/;"	v
+g_is_special_pc	inst_interface.c	/^uint32_t g_is_special_pc;$/;"	v
+g_jcc_num	print_inst.cpp	/^static uint32_t g_jcc_num;$/;"	v	file:
+g_jmp_num	print_inst.cpp	/^static uint32_t g_jmp_num;$/;"	v	file:
+g_main_pc	hook_inst.c	/^uint32_t g_main_pc;$/;"	v
+g_main_start	hook_inst.c	/^uint32_t g_main_start;$/;"	v
+g_map_d_data	txt_rewrite.cpp	/^static map<unsigned int, unsigned char> g_map_d_data;\/\/store all global data$/;"	v	file:
+g_map_d_written	txt_rewrite.cpp	/^static map<unsigned int, char> g_map_d_written; \/\/store all accessed dependence$/;"	v	file:
+g_map_jmp	inline_inst.cpp	/^map<unsigned int, char> g_map_jmp;$/;"	v
+g_map_mem_val	data_rewrite.cpp	/^map<unsigned int, TTYPE*> g_map_mem_val;$/;"	v
+g_map_pc_addr	txt_rewrite.cpp	/^static map<unsigned int, short> g_map_pc_addr; \/\/store imm addr and glboal addr for pc$/;"	v	file:
+g_map_pc_imm	txt_rewrite.cpp	/^static map<unsigned int, unsigned int> g_map_pc_imm;\/\/store all imm value$/;"	v	file:
+g_map_plt	linux.cpp	/^static map<uint32_t, API_CALL*> g_map_plt;$/;"	v	file:
+g_opcode	hook_inst.c	/^xed_iclass_enum_t g_opcode;$/;"	v
+g_pc	hook_inst.c	/^uint32_t g_pc;$/;"	v
+g_return_pc	inst_interface.c	/^uint32_t g_return_pc;$/;"	v
+g_start_pc	hook_inst.c	/^uint32_t g_start_pc;$/;"	v
+g_symbol_nums	print_inst.cpp	/^unsigned int g_symbol_nums = 0;$/;"	v
+getFcnName	helper_hook_inst.c	/^inline int getFcnName(uint32_t addr, char **name)$/;"	f
+get_api_call	linux.cpp	/^API_CALL *get_api_call(uint32_t addr)$/;"	f
+get_current_func	inline_inst.cpp	/^void *get_current_func()$/;"	f
+get_dependence_base	txt_rewrite.cpp	/^unsigned int get_dependence_base()$/;"	f
+get_first_mmap	linux.cpp	/^static uint32_t get_first_mmap(uint32_t addr)$/;"	f	file:
+get_inst	inline_inst.cpp	/^INST* get_inst(unsigned int pc)$/;"	f
+get_jmp_dst	inline_inst.cpp	/^int get_jmp_dst(unsigned int dst)$/;"	f
+get_mem_val	data_rewrite.cpp	/^TTYPE *get_mem_val(unsigned int addr)$/;"	f
+get_mod_name	linux.cpp	/^static void get_mod_name(uint32_t addr, char *name, int size)$/;"	f	file:
+get_name	linux.cpp	/^static void get_name(uint32_t addr, int size, char *buf)$/;"	f	file:
+get_next_mmap	linux.cpp	/^static uint32_t get_next_mmap(uint32_t addr)$/;"	f	file:
+get_pc_addr	txt_rewrite.cpp	/^int get_pc_addr(unsigned int pc)$/;"	f
+get_pc_imm	txt_rewrite.cpp	/^unsigned int get_pc_imm(unsigned int pc)$/;"	f
+get_pgd	linux.cpp	/^static uint32_t get_pgd(uint32_t addr)$/;"	f	file:
+get_pid	linux.cpp	/^static uint32_t get_pid(uint32_t addr)$/;"	f	file:
+get_ret_pc	inline_inst.cpp	/^unsigned int get_ret_pc()$/;"	f
+get_vmend	linux.cpp	/^static uint32_t get_vmend(uint32_t addr)$/;"	f	file:
+get_vmflags	linux.cpp	/^static uint32_t get_vmflags(uint32_t addr)$/;"	f	file:
+get_vmstart	linux.cpp	/^static uint32_t get_vmstart(uint32_t addr)$/;"	f	file:
+handle_api_issues	helper_hook_inst.c	/^inline void handle_api_issues(API_CALL *api, int type)$/;"	f
+handle_data_rewrite	data_rewrite.cpp	/^void handle_data_rewrite(const xed_inst_t* xi) {$/;"	f
+handle_txt_rewrite	txt_rewrite.cpp	/^void handle_txt_rewrite(const xed_inst_t* xi) {$/;"	f
+hook_libc	linux.cpp	/^Libc_item* hook_libc(unsigned int pc)$/;"	f
+hookingpoint2	linux.cpp	/^uint32_t hookingpoint2 = 0;$/;"	v
+ii_primary_map	data_taint.c	/^static SecMap * ii_primary_map[PAGE_NUM];$/;"	v	file:
+ii_primary_map	txt_taint.c	/^static SecMap * ii_primary_map[PAGE_NUM];$/;"	v	file:
+init_kernel_offsets	linux.cpp	/^int init_kernel_offsets(void)$/;"	f
+init_shadow_memory	data_taint.c	/^static void init_shadow_memory(void)$/;"	f	file:
+init_shadow_memory	txt_taint.c	/^static void init_shadow_memory(void)$/;"	f	file:
+init_top	inst_interface.c	/^int init_top(target_ulong mainEntry){$/;"	f
+insert_d_written	txt_rewrite.cpp	/^void insert_d_written(unsigned int addr)$/;"	f
+insert_dependence_data	txt_rewrite.cpp	/^void insert_dependence_data(unsigned int addr, int size)$/;"	f
+insert_func	inline_inst.cpp	/^void insert_func(unsigned int pc)$/;"	f
+insert_inst	inline_inst.cpp	/^void insert_inst(unsigned int pc, unsigned char *inst, unsigned short len)$/;"	f
+insert_jmp_dst	inline_inst.cpp	/^void insert_jmp_dst(unsigned int dst)$/;"	f
+insert_mem_val	data_rewrite.cpp	/^void insert_mem_val(unsigned int addr, unsigned int val)$/;"	f
+insert_pc_addr	txt_rewrite.cpp	/^void insert_pc_addr(unsigned int pc, unsigned int type)$/;"	f
+insert_pc_imm	txt_rewrite.cpp	/^void insert_pc_imm(unsigned int pc, unsigned int imm)$/;"	f
+inst	cpptoc.h	/^	unsigned char inst[15];$/;"	m	struct:_INST
+inst_buffer	print_inst.cpp	/^static char inst_buffer[500], safety_guard[500];$/;"	v	file:
+instrument_functions	hook_inst.c	/^InstrumentFunction instrument_functions[XED_ICLASS_LAST];$/;"	v
+is_api_call	helper_hook_inst.c	/^inline API_TYPE is_api_call(unsigned int dest, char **fname)$/;"	f
+is_d_written	txt_rewrite.cpp	/^int is_d_written(unsigned int addr)$/;"	f
+is_dependence_addr	txt_rewrite.cpp	/^int is_dependence_addr(unsigned int addr)$/;"	f
+is_plt	helper_hook_inst.c	/^inline int is_plt(unsigned int dest)$/;"	f
+kernel_table	linux.cpp	/^static struct koffset kernel_table[] = {$/;"	v	typeref:struct:koffset	file:
+len	cpptoc.h	/^	unsigned short len;$/;"	m	struct:_INST
+libc_init	linux.cpp	/^void libc_init(void)$/;"	f
+libc_map	linux.cpp	/^static map<unsigned int, Libc_item*> libc_map;$/;"	v	file:
+listoffset	linux.cpp	/^int listoffset = 0;$/;"	v
+load_plt_info	linux.cpp	/^void load_plt_info(void)$/;"	f
+load_start_addr	linux.cpp	/^void load_start_addr(void)$/;"	f
+map_tmp	print_inst.cpp	/^static map<unsigned int, char> map_tmp;$/;"	v	file:
+mem_taint	helper_hook_inst.c	/^target_ulong mem_taint;$/;"	v
+mmoffset	linux.cpp	/^int mmoffset = 0;$/;"	v
+name	linux.h	/^	char name[100];$/;"	m	struct:_Libc_item
+next	cpptoc.h	/^	unsigned int next;$/;"	m	struct:__anon3
+next_task_struct	linux.cpp	/^static uint32_t next_task_struct(uint32_t addr)$/;"	f	file:
+operand_is_imm	helper_hook_inst.c	/^int operand_is_imm(const xed_operand_enum_t op_name, uint32_t * value) {$/;"	f
+operand_is_mem4	helper_hook_inst.c	/^int operand_is_mem4(const xed_operand_enum_t op_name, uint32_t* mem_addr, $/;"	f
+operand_is_mem5	patch_inst.cpp	/^int operand_is_mem5(const xed_operand_enum_t op_name)$/;"	f
+operand_is_reg	helper_hook_inst.c	/^int operand_is_reg(const xed_operand_enum_t op_name, xed_reg_enum_t * reg_id) {$/;"	f
+operand_is_relbr	helper_hook_inst.c	/^int operand_is_relbr(const xed_operand_enum_t op_name, uint32_t * branch) {$/;"	f
+output	inst_interface.c	/^FILE* output;$/;"	v
+output	print_inst.cpp	/^static FILE *output;$/;"	v	file:
+output_inst	inst_interface.c	/^FILE* output_inst;$/;"	v
+patch_displacement	patch_inst.cpp	/^void patch_displacement(const xed_inst_t *xi)$/;"	f
+patch_imm_operand	patch_inst.cpp	/^void patch_imm_operand(const xed_inst_t *xi)$/;"	f
+patch_operand	patch_inst.cpp	/^void patch_operand(const xed_inst_t *xi)$/;"	f
+pgdoffset	linux.cpp	/^int pgdoffset = 0;$/;"	v
+pidoffset	linux.cpp	/^int pidoffset = 0;$/;"	v
+pirnt_call_stack	inline_inst.cpp	/^void pirnt_call_stack(){$/;"	f
+pop_callstack	inline_inst.cpp	/^void pop_callstack()$/;"	f
+print_dependence_data	txt_rewrite.cpp	/^void print_dependence_data()$/;"	f
+print_dependence_data_to_file	print_inst.cpp	/^static unsigned int print_dependence_data_to_file(void)$/;"	f	file:
+print_epilogue	print_inst.cpp	/^static void print_epilogue(unsigned int pc)$/;"	f	file:
+print_func	print_inst.cpp	/^static void print_func(FUNCTION *func)$/;"	f	file:
+print_func_decaration	print_inst.cpp	/^static void print_func_decaration()$/;"	f	file:
+print_inst	print_inst.cpp	/^static void print_inst(INST *inst)$/;"	f	file:
+print_operands	print_inst.cpp	/^void print_operands(xed_decoded_inst_t* xedd) {$/;"	f
+print_program	print_inst.cpp	/^void print_program()$/;"	f
+print_prologue	print_inst.cpp	/^static void print_prologue(unsigned int pc)$/;"	f	file:
+push_callstack	inline_inst.cpp	/^void push_callstack(void *func, unsigned int ret)$/;"	f
+regTaint	data_taint.c	/^static UInt regTaint[XED_REG_LAST];$/;"	v	file:
+regTaint	txt_taint.c	/^static UInt regTaint[XED_REG_LAST];$/;"	v	file:
+regUntainted	data_taint.c	/^static void regUntainted()$/;"	f	file:
+regUntainted	txt_taint.c	/^static void regUntainted()$/;"	f	file:
+replace	patch_inst.cpp	/^char *replace(char *st, char *orig, char *repl) {$/;"	f
+ret_pc	inline_inst.cpp	/^	unsigned int ret_pc;$/;"	m	struct:__anon4	file:
+s_type	patch_inst.cpp	/^static int s_type = 0;$/;"	v	file:
+safety_guard	print_inst.cpp	/^static char inst_buffer[500], safety_guard[500];$/;"	v	file:
+setup_data_taint	data_rewrite.cpp	/^static void setup_data_taint()$/;"	f	file:
+setup_inst_hook	hook_inst.c	/^void setup_inst_hook()$/;"	f
+setup_txt_taint	txt_rewrite.cpp	/^static void setup_txt_taint()$/;"	f	file:
+shadow_bytes	data_taint.c	/^static unsigned int shadow_bytes;$/;"	v	file:
+shadow_bytes	txt_taint.c	/^static unsigned int shadow_bytes;$/;"	v	file:
+t_free_shadow_memory	txt_taint.c	/^void t_free_shadow_memory(void)$/;"	f
+t_get_mem_taint	txt_taint.c	/^UInt  t_get_mem_taint( Addr a )$/;"	f
+t_get_reg_taint	txt_taint.c	/^UInt t_get_reg_taint(xed_reg_enum_t reg)$/;"	f
+t_set_mem_taint	txt_taint.c	/^void  t_set_mem_taint( Addr a, UInt pc)$/;"	f
+t_set_mem_taint_bysize	txt_taint.c	/^void  t_set_mem_taint_bysize( Addr a, UInt pc, UInt size)$/;"	f
+t_set_reg_taint	txt_taint.c	/^void t_set_reg_taint(xed_reg_enum_t reg, UInt bytes)$/;"	f
+t_taintInit	txt_taint.c	/^void t_taintInit()$/;"	f
+taskaddr	linux.cpp	/^uint32_t taskaddr = 0;$/;"	v
+tasksize	linux.cpp	/^int tasksize = 0;$/;"	v
+tptr	cpptoc.h	/^	unsigned int tptr;		\/\/txt pointer$/;"	m	struct:_API_CALL
+txt_func	txt_rewrite.cpp	/^static TXTFunc txt_func[XED_ICLASS_LAST];$/;"	v	file:
+type	cpptoc.h	/^	API_TYPE type;$/;"	m	struct:_API_CALL
+type	cpptoc.h	/^	INST_TYPE type;$/;"	m	struct:_INST
+type	data_rewrite.cpp	/^	int type;\/\/1 for data addr; 2 for inst addr$/;"	m	struct:_TYPE	file:
+type	print_inst.cpp	/^	int type;\/\/1 for data addr; 2 for inst addr$/;"	m	struct:_TYPE	file:
+uint32_t	linux.h	/^typedef unsigned int uint32_t;$/;"	t
+update_mem_val_type	data_rewrite.cpp	/^void update_mem_val_type(unsigned int addr, int type, API_TYPE api_call, char *fname)$/;"	f
+val	data_rewrite.cpp	/^	unsigned int val;$/;"	m	struct:_TYPE	file:
+val	print_inst.cpp	/^	unsigned int val;$/;"	m	struct:_TYPE	file:
+vmendoffset	linux.cpp	/^int vmendoffset = 0;$/;"	v
+vmfileoffset	linux.cpp	/^int vmfileoffset = 0;$/;"	v
+vmflagsoffset	linux.cpp	/^int vmflagsoffset = 0;	$/;"	v
+vmnextoffset	linux.cpp	/^int vmnextoffset = 0;$/;"	v
+vmstartoffset	linux.cpp	/^int vmstartoffset = 0;$/;"	v
+xed2_init	inst_interface.c	/^void xed2_init(){$/;"	f
+xed_regmapping	qemu-pemu.c	/^static int xed_regmapping[][3] = {$/;"	v	file:
+xedd	inst_interface.c	/^xed_decoded_inst_t xedd;$/;"	v
+xedd_g	inst_interface.c	/^xed_decoded_inst_t xedd_g;$/;"	v

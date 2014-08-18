@@ -1,0 +1,5 @@
+0804ec80 optind
+0804ec84 stderr
+0804eca0 stdout
+0804eca4 opterr
+0804eca8 optarg

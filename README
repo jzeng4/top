@@ -1,0 +1,21 @@
+Step 1: 
+sudo apt-get build-dep qemu
+
+Step 2:
+cd qemu-1.6-top
+mkdir build && cd build
+../myconfig && make install
+cd bin && cp -r ../../data/* .
+
+Step 3:
+3.1 install ubuntu-11.04 in the guest OS in image ubuntu-11.04.qcow2:
+	./qemu-img create -f qcow2 ubuntu-11.04.qcow2 5G
+	./qemu-system-i386 -m 512 ./ubuntu-11.04.qcow2 -cdrom ubuntu-11.04.iso
+3.2 run TOP platform:
+	./qemu-system-i386 -m 512 ./ubuntu-11.04.qcow2
+	scp the directory qemu-1.6-top/files to guest OS
+	press ctr+alt+2 to switch to qemu command console and run: pemu env (to trace env program)
+	press ctr+alt+1 to switch back to guest OS and run: cd files && ./env
+3.3 run the generated files:
+	scp qemu-1.6-top/build/bin/output_a.out to guest OS
+	in guest OS, compile and run that program: gcc output_a.out && ./a.out
