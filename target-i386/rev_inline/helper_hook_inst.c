@@ -7,6 +7,10 @@
 
 extern uint32_t g_start_pc;
 
+unsigned long g_base;
+unsigned long g_index;
+unsigned long g_disp;
+
 int operand_is_imm(const xed_operand_enum_t op_name, uint32_t * value) {
 	switch (op_name) {
 		/* Immediate */
@@ -23,7 +27,7 @@ int operand_is_imm(const xed_operand_enum_t op_name, uint32_t * value) {
 				*value = (uint32_t) unsigned_imm_val;
 			}
 #ifdef DEBUG
-			fprintf(stderr, "----operand_is_imm0:%x\n", *value);	
+			//fprintf(stderr, "----operand_is_imm0:%x\n", *value);	
 #endif
 
 			return 1;
@@ -34,7 +38,7 @@ int operand_is_imm(const xed_operand_enum_t op_name, uint32_t * value) {
 			    xed_decoded_inst_get_second_immediate(&xedd_g);
 			*value = (uint32_t) unsigned_imm_val;
 #ifdef DEBUG
-			fprintf(stderr, "----operand_is_imm1:%x\n", *value);	
+			//fprintf(stderr, "----operand_is_imm1:%x\n", *value);	
 #endif
 
 			return 1;
@@ -46,13 +50,13 @@ int operand_is_imm(const xed_operand_enum_t op_name, uint32_t * value) {
 
 }
 
-target_ulong mem_taint;
+//target_ulong mem_taint;
 int operand_is_mem4(const xed_operand_enum_t op_name, uint32_t* mem_addr, 
 		   int operand_i)
 {
 
 	xed_reg_enum_t basereg;	
-	mem_taint=0;
+	//mem_taint = 0;
 
 	switch (op_name) {
 		/* Memory */
@@ -110,22 +114,17 @@ int operand_is_mem4(const xed_operand_enum_t op_name, uint32_t* mem_addr,
 
 			*mem_addr =
 			    segbase + base + index * scale + displacement;
-#ifdef DEBUG
-			fprintf(stdout, "operand_is_mem4:\t%x\t%x\t%x\t%x\t%x\t%x\n", segbase, base, index, scale, displacement, *mem_addr);	
-			int tempvalue;
-			PEMU_read_mem(*mem_addr, 4, &tempvalue);
-			fprintf(stderr, "----operand_is_mem4:\t%x\t%x\t%x\t%x\t%x\t%x(%x)\n", segbase, base, index, scale, displacement, *mem_addr, tempvalue);	
-#endif
-//			if((long) displacement > (long)base)
-//				mem_taint=*mem_addr;
-			target_ulong a,b;
+#if 0			
+			target_ulong a,b,c;
 			a = abs(*mem_addr-displacement);
 			b = abs(*mem_addr-base);
-			if(a <= b)
+            c = abs(*mem_addr-index);
+			if(a <= b && a < c)
 				mem_taint = *mem_addr;
-#ifdef DEBUG
-			fprintf(stdout, "displacement %lx %lx %x\n", displacement, base, mem_taint); 
 #endif
+			g_base = base;
+			g_index = index;
+			g_disp = displacement;
 			return 1;
 		}
 
@@ -219,39 +218,6 @@ inline int is_plt(unsigned int dest)
 
 }
 
-#if 0
-inline int is_new_func(unsigned dest)
-{
-	char buf[15];
-	unsigned int tmp;
-	xed_reg_enum_t reg_id;
-	PEMU_read_mem(dest, 15, buf);
-
-	xed_decoded_inst_zero_set_mode(&xedd_g, &dstate);
-    xed_error_enum_t xed_error = xed_decode(&xedd_g,
-			XED_STATIC_CAST(const xed_uint8_t *,  buf), 15);
-
-	if (xed_error == XED_ERROR_NONE){
-		xed_iclass_enum_t opcode = 	xed_decoded_inst_get_iclass(&xedd_g);
-		const xed_inst_t *xi = xed_decoded_inst_inst(&xedd_g);
-		const xed_operand_t *op = xed_inst_operand(xi, 0);
-		xed_operand_enum_t op_name = xed_operand_name(op);
-		if(opcode == XED_ICLASS_PUSH){
-			if(operand_is_reg(op_name, &reg_id)){
-				if(reg_id == XED_REG_EBP){	
-					return 1;
-				}
-			}
-		}
-		return 0;
-	}
-
-}
-#endif
-
-
-
-
 #ifndef WINDOWS_FORMAT
 extern API_CALL *get_api_call(uint32_t addr);
 inline int getFcnName(uint32_t addr, char **name)
@@ -318,6 +284,10 @@ inline void handle_api_issues(API_CALL *api, int type)
 	uint32_t pos;//index for parameters
 
 #ifdef DEBUG
+	if(api == NULL) {
+		printf(stderr, "please provide plt information\n");
+		assert(0);
+	}
 	fprintf(stdout, "api->dptr\t%x\n", api->dptr);
 #endif
 	if((tmp = api->dptr) != 0){//api has pointer to data
@@ -326,10 +296,12 @@ inline void handle_api_issues(API_CALL *api, int type)
 
 		while(tmp){
 			if(tmp & 1){
-				esp += 4 * pos;
 				PEMU_read_mem(esp, 4, &addr);				
 				
 				if(type == 0 && (taint = t_get_mem_taint(esp))){
+#ifdef DEBUG
+                    fprintf(stdout, "API has poiter %x %x\n", addr, taint);
+#endif
 					insert_pc_addr(taint, 1);
 				}else if(type == 1 && (taint = d_get_mem_taint(addr))){
 					update_mem_val_type(taint, 1, API_NONE, 0);
@@ -338,7 +310,7 @@ inline void handle_api_issues(API_CALL *api, int type)
 				insert_dependence_data(addr, 100);
 			}
 			tmp >>= 1;
-			pos ++;
+		    esp += 4;
 		}
 	}
 	if((tmp = api->tptr) != 0){//api has pointer to function
@@ -378,3 +350,22 @@ inline void api_copy(API_CALL *to, API_CALL *from)
 #endif
 }
 
+int find_min_dist(unsigned long mem_addr, 
+		unsigned long base, unsigned long index, unsigned long disp)
+{
+	unsigned long b = abs(mem_addr-base);
+	unsigned long i = abs(mem_addr-index);
+	unsigned long d = abs(mem_addr-disp);
+
+	if(b <= i && b <= d) {
+		return 1;
+	} else if(i <= b && i <= d) {
+		return 2;
+	} else if(d <= b && d <= i) {
+		return 3;
+	} else {
+		fprintf(stdout, "here:::%x %x %x %x\n", base, index, disp, mem_addr);
+		fflush(stdout);
+		assert(0);
+	}
+}

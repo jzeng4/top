@@ -257,11 +257,18 @@ uint32_t PEMU_get_cr3()
 
 int PEMU_read_mem(uint32_t vaddr, int len, void *buf)
 {
-//	PIN_SafeCopy(buf, (VOID*)vaddr, 15);
-//	memcpy(buf, (void*)vaddr, len);
-//	return 0;
-	
-	//struct CPUX86State* env=(struct CPUX86State*)(first_cpu->env_ptr);
 	return cpu_memory_rw_debug(first_cpu, vaddr, buf, len, 0);
+}
+
+void PEMU_print_all_reg(void)
+{
+	fprintf(stdout, "EAX:%x\nEBX:%x\nECX:%x\nEDX:%x\nESI:%x\nEDI:%x\n",
+			PEMU_get_reg(XED_REG_EAX),
+			PEMU_get_reg(XED_REG_EBX),
+			PEMU_get_reg(XED_REG_ECX),
+			PEMU_get_reg(XED_REG_EDX),
+			PEMU_get_reg(XED_REG_ESI),
+			PEMU_get_reg(XED_REG_EDI));
+
 }
 

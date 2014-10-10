@@ -11,9 +11,6 @@
 
 /******************Global Data Section***************************/
 
-#ifndef DEBUG
-#define DEBUG
-#endif
 
 
 
@@ -114,9 +111,6 @@ static void Instrument_JMP(INS xi)
 #endif
 	if (operand_is_relbr(op_name, &dest)){
 		dest += g_pc + xed_decoded_inst_get_length(&xedd_g);
-#ifdef DEBUG
-		fprintf(stderr, "----jmp_relbr is %x\n", dest);
-#endif	
 		if(is_plt(dest)){
 			fprintf(stderr, "error in jmp\n");
 			if(is_plt(dest)){
@@ -132,16 +126,30 @@ static void Instrument_JMP(INS xi)
 
 		//Hush.b
 		//If it jump to the begining of a function
-
+        unsigned int esp = PEMU_get_reg(XED_REG_ESP);
+        extern unsigned int g_current_esp;
+        if(g_pc == 0x80535de)
+            printf("TAIL %x %x\n", esp, g_current_esp); 
+        if(esp == g_current_esp && dest < g_pc )
+        {
+	        void *func;
+            target_ulong ret;
+            PEMU_read_mem(esp , 4, &ret);
+#ifdef DEBUG
+			fprintf(stdout, "Tail call %x\n", dest);			
+#endif
+		    func = create_func1(dest);
+            pop_callstack();
+            push_callstack(func, ret, esp);
+        }
 		//Hush.e
 
 	}else if(operand_is_mem4(op_name, &dest, 0)){
 		inst->type = INJMP;
-#ifdef DEBUG
-		fprintf(stderr, "----jmp dest is a mem %x\n", dest);
-#endif
+		PEMU_read_mem(dest, 4, &dest);
 	}else if(operand_is_reg(op_name, &reg_id)){
 		inst->type = INJMP;
+		dest = PEMU_get_reg(reg_id);	
 	}
 
 	insert_jmp_dst(dest);
@@ -185,9 +193,8 @@ static void Instrument_CALL(INS xi)
 #endif
 		api_copy(&inst->api_call, get_api_call(dest));
 	}else{
-		fprintf(stderr, "----PUSH %x -- %x\n", g_pc, dest);	
 		func = (void*)create_func1(dest);
-		push_callstack(func, return_pc);
+		push_callstack(func, return_pc, PEMU_get_reg(XED_REG_ESP) -  sizeof(target_ulong));
 	}
 }
 
@@ -205,7 +212,6 @@ static void Instrument_RET(INS xi)
 	int buf=0;
 	PEMU_read_mem(cur_esp, 4, &buf);
 	if(get_ret_pc()==buf){
-		fprintf(stderr, "----POP %x -- %x\n", g_pc, buf);	
 		pop_callstack();
 	}
 	else{
@@ -217,9 +223,7 @@ static void Instrument_RET(INS xi)
 //Hush.b
 static  Instrument_SCASB(INS xi){
 #ifdef DEBUG
-	fprintf(stderr, "----Instrument scasbb\n");
 #endif	
-//	if(xed_operand_values_has_repne_prefix(xi))
 }
 //Hush.e
 
@@ -275,15 +279,6 @@ xed_iclass_enum_t g_opcode;
 void Instrument(INS ins){
 	xed_iclass_enum_t opcode = g_opcode = xed_decoded_inst_get_iclass(&xedd_g);
 	strcpy(g_inst_name, xed_iclass_enum_t2str(opcode));
-
-#if 0
-	INST *inst;
-	if((inst = get_inst(g_pc)) != 0){
-		if(inst->type != INJMP)
-			return;
-	}
-#endif
-
 
 	if(g_pc == get_ret_pc()){
 		pop_callstack();

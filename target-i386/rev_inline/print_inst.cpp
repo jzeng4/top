@@ -15,6 +15,8 @@ unsigned int g_dependence_base;
 
 //statistics
 
+#undef DEBUG
+
 #ifdef STATISTICS
 unsigned int g_check_nums = 0;
 unsigned int g_symbol_nums = 0;
@@ -224,6 +226,20 @@ static unsigned int print_dependence_data_to_file(void)
 
 	unsigned int size;
 	size = dump_dependence_data(output);//dump dependence data
+	//yang.begin
+    //extern label
+    map<unsigned int, unsigned int> label;
+	for(map<unsigned int, TTYPE*>::iterator it = g_map_mem_val.begin();
+			it != g_map_mem_val.end(); it++){
+		unsigned int addr = it->first;
+		unsigned int val = it->second->val;
+        if(it->second->type == 2 && !it->second->api_call.fname)
+            label[val] = val;
+    }
+    for(map<unsigned int, unsigned int > ::iterator it = label.begin();
+            it != label.end(); it++)
+        fprintf(output, "extern void * L_0x%x;\n", it->first);
+    //yang.end
 	fprintf(output, "void init_dependence_data(){\n");
 	
 	for(map<unsigned int, TTYPE*>::iterator it = g_map_mem_val.begin();
@@ -257,10 +273,13 @@ static unsigned int print_dependence_data_to_file(void)
 			}
 			else{
 				//Hush.b
-				fprintf(output, "*(int*)(global_data+0x%x) = L_0x%x;\n", 
+				fprintf(output, "*(int*)(global_data+0x%x) = &L_0x%x;\n", 
 						addr-g_dependence_base, val);
 				//Hush.e
 			}
+		} else if(it->second->type == 3) {
+			fprintf(output, "*(int*)(global_data+0x%x) = func_0x%x;\n", 
+					addr-g_dependence_base, val);
 		}
 	}
 	fprintf(output, "\n}\n\n");
@@ -269,16 +288,29 @@ static unsigned int print_dependence_data_to_file(void)
 }
 
 
+static void print_debug(void)
+{
+	fprintf(stdout, "print pc:\t0x%x\n", g_pc);
+	fprintf(output, "\/\/0x%x\n", g_pc);
+	fprintf(output, "\"pushf\\n\\t\"\n");
+	fprintf(output, "\"pushl %%%%eax\\n\\t\"\n");
+	fprintf(output, "\"pushl %%%%edx\\n\\t\"\n");
+	fprintf(output, "\"pushl %%%%ecx\\n\\t\"\n");
+	fprintf(output, "\"pushl $0x%x\\n\\t\"\n", g_pc);
+	fprintf(output, "\"call printpc\\n\\t\"\n");
+	fprintf(output, "\"addl $0x4, %%%%esp\\n\\t\"\n");
+	fprintf(output, "\"popl %%%%ecx\\n\\t\"\n");
+	fprintf(output, "\"popl %%%%edx\\n\\t\"\n");
+	fprintf(output, "\"popl %%%%eax\\n\\t\"\n");
+	fprintf(output, "\"popf\\n\\t\"\n");
+}
+
 static void print_inst(INST *inst)
 {
 //#if 0
 	xed_decoded_inst_zero_set_mode(&xedd_g, &dstate);
 	xed_error_enum_t xed_error = xed_decode(&xedd_g,
 			XED_STATIC_CAST(const xed_uint8_t *,  inst->inst), 15);
-
-#ifdef DEBUG
-	fprintf(stdout, "print pc:\t0x%x\n", g_pc);
-#endif
 
 #ifdef STATISTICS
 			g_inst_num++;
@@ -292,6 +324,7 @@ static void print_inst(INST *inst)
 		xed_decoded_inst_dump_intel_format(&xedd_g, g_inst_str, sizeof(g_inst_str), 0);
 #else
 		xed_decoded_inst_dump_att_format(&xedd_g, g_inst_str, sizeof(g_inst_str), 0);
+		//xed_decoded_inst_dump_intel_format(&xedd_g, g_inst_str, sizeof(g_inst_str), 0);
 #endif
 		const xed_inst_t *xi = xed_decoded_inst_inst(&xedd_g);
 	
@@ -329,6 +362,11 @@ static void print_inst(INST *inst)
 #else
 			fprintf(output, "\"L_0x%x:\"\n", g_pc);
 #endif
+
+#ifdef DEBUG
+		print_debug();
+#endif
+
 #ifdef WINDOWS_FORMAT
 		fprintf(output, "%s\n", inst_buffer);
 #else
@@ -400,14 +438,14 @@ static void print_func(FUNCTION *func)
 	for(FUNCTION::iterator it = func->begin();
 			it != func->end();it++){
 		g_pc = it->first;
-		//fprintf(output, "//%x\n", g_pc);
+		fprintf(output, "//%x\n", g_pc);
 		if(map_tmp.count(it->first) == 0 ){
 			print_inst(it->second);
 		}
 		map_tmp[it->first] = 0;
 	}
 #ifndef WINDOWS_NAKED
-	print_epilogue(start_pc);
+	//print_epilogue(start_pc);
 #endif
 
 #ifdef WINDOWS_FORMAT
@@ -415,11 +453,17 @@ static void print_func(FUNCTION *func)
 	fprintf(output, "}\n");
 #else
 	fprintf(output, "\"L_ERROR_0x%x:\\n\\t\"\n", start_pc);
+	fprintf(output, "\"call safety_guard\\n\\t\"\n");
 	fprintf(output, ":);\n");
 #endif
 }
 
-static void print_func_decaration()
+static void print_header(void)
+{
+	fprintf(output, "#include<stdio.h>");
+}
+
+static void print_func_decaration(void)
 {
 	for(PROGRAM::iterator it = g_current_program->begin();//dump functions
 			it != g_current_program->end();it++){
@@ -438,6 +482,23 @@ typedef struct _Dst_item{
 extern map<unsigned int, Dst_item*> dst_map;
 //Hush.e
 
+
+void print_safety_guard(void)
+{
+	fprintf(output, "void safety_guard(void){printf(\"saftety guard triggered\\n\"); exit(-1);}\n\n");
+}
+
+void print_print_pc(void)
+{
+	fprintf(output, "FILE *output;\n");
+	fprintf(output, "void printpc(unsigned int pc)\n");
+	fprintf(output, "{\n");
+	fprintf(output, "  fprintf(output, \"%%x\\n\", pc);\n");
+	fprintf(output, "  fflush(output);\n");
+	fprintf(output, "}\n");
+
+}
+
 void print_program()
 {
 #ifdef DEBUG
@@ -449,8 +510,11 @@ void print_program()
 		fprintf(stderr, "error in print_program\n");
 		exit(0);
 	}
-	
+
+	print_header();	
 	print_func_decaration();
+	print_safety_guard();
+	print_print_pc();
 	
 	//yang
 	unsigned  instsize = 0;
@@ -471,16 +535,20 @@ void print_program()
 #ifdef DEBUG
 			fprintf(stderr, "----dst_map size is %d\n", dst_map.size());	
 #endif
+
+#if 0
 			if(!dst_map.empty()){
 				for(map<unsigned int, Dst_item*>::iterator it= dst_map.begin();
 					it!=dst_map.end();it++){
 					fprintf(output, "extern %s;\n", it->second->name);	
 				}	
 			}
+#endif
+			fprintf(output, "output=fopen(\"log\", \"w\");\n");
 //Hush.e
 		}else{
 			fprintf(output, "int func_0x%x(){\n", it->first);
-		}	
+		}
 #ifdef DEBUG
 		fprintf(stderr, "----function start pc:%x\t%x\n", it->first, it->second);
 #endif
@@ -520,9 +588,9 @@ void print_operands(xed_decoded_inst_t* xedd) {
           case XED_OPERAND_RELBR: { // branch displacements
               xed_uint_t disp_bits = xed_decoded_inst_get_branch_displacement_width(xedd);
               if (disp_bits) {
-                  cout  << "BRANCH_DISPLACEMENT_BYTES= " << disp_bits << " ";
+                  //cout  << "BRANCH_DISPLACEMENT_BYTES= " << disp_bits << " ";
                   xed_int32_t disp = xed_decoded_inst_get_branch_displacement(xedd);
-                  cout << hex << setfill('0') << setw(8) << disp << setfill(' ') << dec;
+                  //cout << hex << setfill('0') << setw(8) << disp << setfill(' ') << dec;
               }
             }
             break;
@@ -531,19 +599,19 @@ void print_operands(xed_decoded_inst_t* xedd) {
               xed_uint_t width = xed_decoded_inst_get_immediate_width(xedd);
               if (xed_decoded_inst_get_immediate_is_signed(xedd)) {
                   xed_int32_t x =xed_decoded_inst_get_signed_immediate(xedd);
-                  cout << hex << setfill('0') << setw(8) << x << setfill(' ') << dec 
-                       << '(' << width << ')';
+                  //cout << hex << setfill('0') << setw(8) << x << setfill(' ') << dec 
+                  //     << '(' << width << ')';
               }
               else {
                   xed_uint64_t x = xed_decoded_inst_get_unsigned_immediate(xedd); 
-                  cout << hex << setfill('0') << setw(16) << x << setfill(' ') << dec 
-                       << '(' << width << ')';
+                  //cout << hex << setfill('0') << setw(16) << x << setfill(' ') << dec 
+                  //     << '(' << width << ')';
               }
               break;
           }
           case XED_OPERAND_IMM1: { // immediates
               xed_uint8_t x = xed_decoded_inst_get_second_immediate(xedd);
-              cout << hex << setfill('0') << setw(2) << (int)x << setfill(' ') << dec;
+              //cout << hex << setfill('0') << setw(2) << (int)x << setfill(' ') << dec;
               break;
           }
 
@@ -568,14 +636,14 @@ void print_operands(xed_decoded_inst_t* xedd) {
               break;
           }
           default:
-            cout << "[Not currently printing value of field " << xed_operand_enum_t2str(op_name) << ']';
+            //cout << "[Not currently printing value of field " << xed_operand_enum_t2str(op_name) << ']';
             break;
 
         }
-        cout << " " << xed_operand_visibility_enum_t2str(xed_operand_operand_visibility(op))
-             << " / " << xed_operand_action_enum_t2str(xed_operand_rw(op))
-             << " / " << xed_operand_width_enum_t2str(xed_operand_width(op));
-        cout << " bytes=" << xed_decoded_inst_operand_length(xedd,i);
-        cout << endl;
+        //cout << " " << xed_operand_visibility_enum_t2str(xed_operand_operand_visibility(op))
+        //     << " / " << xed_operand_action_enum_t2str(xed_operand_rw(op))
+        //     << " / " << xed_operand_width_enum_t2str(xed_operand_width(op));
+        //cout << " bytes=" << xed_decoded_inst_operand_length(xedd,i);
+        //cout << endl;
     }
 }

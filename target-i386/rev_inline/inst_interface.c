@@ -20,6 +20,7 @@ char file_name[100];
 uint32_t g_is_printed;
 uint32_t g_is_special_pc;
 char g_inst_str[500];
+FILE *inst_log;
 
 extern uint32_t g_heap_num;
 extern uint32_t g_rodata_size;
@@ -51,7 +52,14 @@ void xed2_init(){
 
 }
 
-
+void log_init()
+{
+	inst_log = fopen("inst_log", "w");
+	if(!inst_log) {
+		perror("can't open inst_log\n");
+		exit(0);
+	}
+}
 
 int init_top(target_ulong mainEntry){
 	xed_decoded_inst_set_mode(&xedd_g, XED_MACHINE_MODE_LEGACY_32,
@@ -61,6 +69,7 @@ int init_top(target_ulong mainEntry){
 	setup_inst_hook();
 	t_taintInit();
 	d_taintInit();
+	log_init();
 
 	g_main_pc = mainEntry;
 	return 0;
@@ -73,7 +82,7 @@ void print_dependence_data();
 extern void update_mem_to_be_read();
 //Hush.e
 void Instrument_PC1(uint8_t* buf){
-	
+
 	if(g_main_pc == g_pc){
 		g_main_start = 1;
 		create_program(g_main_pc);//
@@ -86,34 +95,22 @@ void Instrument_PC1(uint8_t* buf){
     xed_error_enum_t xed_error = xed_decode(&xedd_g,
 			XED_STATIC_CAST(const xed_uint8_t *,  buf), 15);
 
-//	memcpy(g_inst_buf, buf, 15);
-
 	if (xed_error == XED_ERROR_NONE) 
 	{
-	   //xed_decoded_inst_dump_intel_format(&xedd_g, g_inst_str, sizeof(g_inst_str), 0);    						
 		xed_decoded_inst_dump_att_format(&xedd_g, g_inst_str, sizeof(g_inst_str), 0);
 		const xed_inst_t *xi = xed_decoded_inst_inst(&xedd_g);
 
 #ifdef DEBUG
-	// Print all $eax to see the function return value
-		fprintf(stderr, "pc:\t%x\t%s\t(eax=%x)\n", g_pc, g_inst_str, PEMU_get_reg(XED_REG_EAX));
-#endif
-	//	if(g_pc==0x804eabc){
-	//		char tmp[16];
-	//	PEMU_read_mem(0x805975b, 16, tmp);	
-	//		fprintf(stderr, "******%s\n",tmp );
-	//	}
-	 
-//		find_pc_from_rbt(g_pc);
-		
+		fprintf(stdout, "==============================pc:\t%x\t%s\t(eax=%x)=======================\n", g_pc, g_inst_str, PEMU_get_reg(XED_REG_EAX));
+		PEMU_print_all_reg();
+		print_all_reg_txt();
+		print_all_reg_data();
+		fprintf(inst_log, "%x\n", g_pc);
+#endif		
 		//Hush.b
-		//update_mem_to_be_read();
+		update_mem_to_be_read();
 		//Hush.e	
-
 		Instrument(xi);
-//			add_pc_into_rbt(g_pc);
-//			g_is_special_pc = 0;
-//			g_prev_pc = g_pc;
 		
 	}
 

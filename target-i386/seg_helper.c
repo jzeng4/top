@@ -1199,15 +1199,8 @@ static void do_interrupt_all(X86CPU *cpu, int intno, int is_int,
 			}
 		}
 	}
-	//Hush.b
-	//Debug segment fault
-		if(PEMU_cr3 == PEMU_get_cr3(0)){
-			if(intno==14){
-				fprintf(stderr, "####%x, %x\n", seg_det, env->cr[2]);
-			}
-		}
-	//Hush.e
-    if (qemu_loglevel_mask(CPU_LOG_INT)) {
+    
+	if (qemu_loglevel_mask(CPU_LOG_INT)) {
         if ((env->cr[0] & CR0_PE_MASK)) {
             static int count;
 

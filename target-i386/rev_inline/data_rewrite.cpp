@@ -49,6 +49,11 @@ void update_mem_val_type(unsigned int addr, int type, API_TYPE api_call, char *f
 		g_count++;
 #endif
 		val = g_map_mem_val[addr]->val;
+        if(type > 0)
+        {
+            PEMU_read_mem( addr, 4, &val);
+		    g_map_mem_val[addr]->val = val;
+        }
 		g_map_mem_val[addr]->type = type;
 		g_map_mem_val[addr]->api_call.fname = fname;
 		g_map_mem_val[addr]->api_call.type = api_call;
@@ -257,12 +262,9 @@ static void Instrument_JMP(const xed_inst_t* xi)
 		//Hush.b
 		else{
 			update_mem_val_type(dest, 2, API_NONE, 0);
-#ifdef DEBUG
-			fprintf(stderr, "----Updating dest %x\n", dest);
-#endif
 		}
 		//Hush.e
-	}else if(operand_is_reg(op_name, &reg_id)){
+	} else if(operand_is_reg(op_name, &reg_id)){
 		if(taint = d_get_reg_taint(reg_id)){
 			update_mem_val_type(taint, 2, API_NONE, 0);
 		}
@@ -278,6 +280,7 @@ static void Instrument_CALL(const xed_inst_t* xi)
 #endif
 	xed_reg_enum_t reg_id;
 	uint32_t buf;
+    uint32_t addr;
 	unsigned int value = 0, dest = 0;
 	const xed_operand_t *op = xed_inst_operand(xi, 0);
 	xed_operand_enum_t op_name = xed_operand_name(op);
@@ -286,12 +289,12 @@ static void Instrument_CALL(const xed_inst_t* xi)
 	API_TYPE type;	
 
 //TODO: value may be plt call	
-	if(operand_is_mem4(op_name, &dest, 0)){
+	if(operand_is_mem4(op_name, &addr, 0)){
 		int mem_idx = op_name == XED_OPERAND_MEM1 ? 1 : 0;
 		xed_reg_enum_t base_regid =
 			xed_decoded_inst_get_base_reg(&xedd_g, mem_idx);
 			
-		PEMU_read_mem(dest, 4, &buf);
+		PEMU_read_mem(addr, 4, &buf);
 		dest = buf;
 
 		if(taint = d_get_reg_taint(base_regid)){			
@@ -299,14 +302,14 @@ static void Instrument_CALL(const xed_inst_t* xi)
 //				update_mem_val_type(taint, 2, type, fname);
 				goto API_CALL;
 			}else{
-				update_mem_val_type(taint, 2, API_NONE, 0);
+				update_mem_val_type(taint, 3, API_NONE, 0);
 			}
-		}else if(taint = d_get_mem_taint(dest)){
+		}else if(taint = d_get_mem_taint(addr)){
 			if(type = is_api_call(dest, &fname)){
 //				update_mem_val_type(taint, 2, type, fname);
 				goto API_CALL;
 			}else{
-				update_mem_val_type(taint, 2, API_NONE, 0);
+				update_mem_val_type(taint, 3, API_NONE, 0);
 			}
 
 		}
@@ -363,6 +366,7 @@ API_CALL:
 	update_mem_val_type(taint, 2, type, fname);
 	//api_copy(&inst->api_call, get_api_call(dest));
 REST:
+    d_set_reg_taint(XED_REG_EAX, 0);
 	handle_api_issues(get_api_call(dest), 1);
 }
 
@@ -370,6 +374,8 @@ static void Instrument_LEA(const xed_inst_t* xi)
 {
 	xed_reg_enum_t reg_id;
 	unsigned int mem_addr, imm;
+    int a, b, c;
+    unsigned long value;
 
 	const xed_operand_t *op_0 = xed_inst_operand(xi, 0);
 	const xed_operand_t *op_1 = xed_inst_operand(xi, 1);
@@ -384,8 +390,42 @@ static void Instrument_LEA(const xed_inst_t* xi)
 				mem_idx = 1;
 			xed_reg_enum_t base_regid =
 				xed_decoded_inst_get_base_reg(&xedd_g, mem_idx);
-			d_set_reg_taint(reg_id, d_get_reg_taint(base_regid));
-		}else{
+		    xed_reg_enum_t index_regid =
+			    xed_decoded_inst_get_index_reg(&xedd_g, mem_idx);
+
+			c = xed_decoded_inst_get_memory_displacement(&xedd_g, mem_idx);
+
+            if(index_regid == XED_REG_INVALID)
+                b = 0;
+            else
+                b = PEMU_get_reg(index_regid);
+
+            if(base_regid == XED_REG_INVALID)
+                a = 0;
+            else
+                a  =  PEMU_get_reg(base_regid);
+            if( a > b)
+            {
+                if ( c > a)
+                {
+			//	    PEMU_read_mem(mem_addr, 4, &value);
+			//	    insert_mem_val(mem_addr, value);				
+            //        d_set_reg_taint(reg_id, mem_addr);
+                }
+                else
+		 	       d_set_reg_taint(reg_id, d_get_reg_taint(base_regid));
+            }else
+            {   
+                  if ( c > b)
+                  {
+			//	    PEMU_read_mem(mem_addr, 4, &value);
+			//	    insert_mem_val(mem_addr, value);				
+            //        d_set_reg_taint(reg_id, mem_addr);
+                  }
+                  else
+		 	        d_set_reg_taint(reg_id, d_get_reg_taint(index_regid));
+            }
+        }else{
 			fprintf(stderr, "error in Instrument_LEA\n");
 			exit(0);
 		}
@@ -507,6 +547,13 @@ static void setup_data_taint()
 
 
 extern uint32_t mem_taint;
+//yang.begin
+typedef struct _Dst_item{
+	char name[100];
+}Dst_item;
+
+extern map<unsigned int, Dst_item*> dst_map;
+//yang.end
 
 /*****************interface functions********************/
 void handle_data_rewrite(const xed_inst_t* xi) {
@@ -538,20 +585,11 @@ void handle_data_rewrite(const xed_inst_t* xi) {
 				update_mem_val_type(taint, 1, API_NONE, 0);
 				value = get_mem_val(taint)->val;
 				insert_dependence_data(mem_addr,xed_decoded_inst_operand_length(&xedd_g, 0));
-				/*
-				if(value < mem_addr)//value is root
-					insert_dependence_data(value, 
-							mem_addr + xed_decoded_inst_operand_length(&xedd_g, 0) - value);
-				else{ 
-					insert_dependence_data(mem_addr,
-							value > mem_addr + xed_decoded_inst_operand_length(&xedd_g, 0) ?
-							value : mem_addr + xed_decoded_inst_operand_length(&xedd_g, 0) - mem_addr);
-				}*/
 			}
 		}
 		//Hush.b
 		else{//For the scenario of no base_reg(just displacement + scale * index)
-			fprintf(stderr, "----****g_pc: %x: %x--size(%d)\n", g_pc, mem_addr, xed_decoded_inst_operand_length(&xedd_g, 0));
+			//fprintf(stderr, "----****g_pc: %x: %x--size(%d)\n", g_pc, mem_addr, xed_decoded_inst_operand_length(&xedd_g, 0));
 			insert_dependence_data(mem_addr,  xed_decoded_inst_operand_length(&xedd_g, 0) );
 		}
 		//Hush.e
@@ -564,18 +602,39 @@ void handle_data_rewrite(const xed_inst_t* xi) {
 		if((base_regid != XED_REG_INVALID)){
 			int a = 0,b = 0;
 			a = PEMU_get_reg(base_regid);
-			b = PEMU_get_reg(index_regid);	
+            if(index_regid != XED_REG_INVALID);
+			       b = PEMU_get_reg(index_regid);	
 			if(index_regid!=XED_REG_INVALID && b>a){
-				if((taint = d_get_reg_taint(index_regid))&&mem_taint==0)
+#if 0
+				if((taint = d_get_reg_taint(index_regid)) && mem_taint == 0)
 				{
 					update_mem_val_type(taint, 1, API_NONE, 0);
 					value = get_mem_val(taint)->val;
 					insert_dependence_data(mem_addr,xed_decoded_inst_operand_length(&xedd_g, 0));
 				}
-			}else if((taint = d_get_reg_taint(base_regid))&&mem_taint==0){
+#endif
+				if((taint = d_get_reg_taint(index_regid))) {
+					if(find_min_dist(mem_addr, g_base, g_index, g_disp) != 3) {
+						update_mem_val_type(taint, 1, API_NONE, 0);
+						value = get_mem_val(taint)->val;
+						insert_dependence_data(mem_addr,xed_decoded_inst_operand_length(&xedd_g, 0));
+					}
+				}
+			}
+#if 0
+			else if((taint = d_get_reg_taint(base_regid)) && mem_taint == 0){
 					update_mem_val_type(taint, 1, API_NONE, 0);
 					value = get_mem_val(taint)->val;
 					insert_dependence_data(mem_addr,xed_decoded_inst_operand_length(&xedd_g, 0));
+			}
+#endif
+			else if(taint = d_get_reg_taint(base_regid)) {
+				if(find_min_dist(mem_addr, g_base, g_index, g_disp) != 3) {
+					update_mem_val_type(taint, 1, API_NONE, 0);
+					value = get_mem_val(taint)->val;
+					insert_dependence_data(mem_addr,xed_decoded_inst_operand_length(&xedd_g, 0));
+
+				}
 			}
 
 		}
@@ -601,7 +660,7 @@ void handle_data_rewrite(const xed_inst_t* xi) {
 		
 		if(operand_is_mem4(op_name0, &mem_addr, 0)){
 			//Hush.b
-			fprintf(stderr, "----++++pc %x: %x: %d, %d\n",g_pc, mem_addr, is_dependence_addr(mem_addr) , !is_d_written(mem_addr));
+			//fprintf(stderr, "----++++pc %x: %x: %d, %d\n",g_pc, mem_addr, is_dependence_addr(mem_addr) , !is_d_written(mem_addr));
 			//Hush.e
 			if(is_dependence_addr(mem_addr) && !is_d_written(mem_addr)){
 #ifdef DEBUG
@@ -617,8 +676,8 @@ void handle_data_rewrite(const xed_inst_t* xi) {
 	}
 	else{
 		if(opcode != XED_ICLASS_LEA && operand_is_mem4(op_name1, &mem_addr, 1)){
-			if(is_dependence_addr(mem_addr) && !is_d_written(mem_addr)){
-				if(operand_is_reg(op_name0, &reg_id_0)){
+			if(is_dependence_addr(mem_addr) && !is_d_written(mem_addr) && dst_map.count(mem_addr)==0){
+				if(operand_is_reg(op_name0, &reg_id_0) ){
 #ifdef DEBUG
 					fprintf(stdout, "taint source:\t%x\n", mem_addr);
 #endif

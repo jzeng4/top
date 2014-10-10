@@ -248,12 +248,20 @@ uint32_t PEMU_get_reg(xed_reg_enum_t reg_id)
 
 int PEMU_read_mem(uint32_t vaddr, int len, void *buf)
 {
-//	PIN_SafeCopy(buf, (VOID*)vaddr, 15);
-//	memcpy(buf, (void*)vaddr, len);
-//	return 0;
-	return cpu_memory_rw_debug(cpu_single_env, vaddr, buf, len, 0);
-	//Hush.b
-	//Hush.TODO
-	//Hush.e
+	if(cpu_memory_rw_debug(cpu_single_env, vaddr, buf, len, 0) != 0) {
+		fprintf(stderr, "error in read memory\n");
+		assert(0);
+	}
+}
+
+void PEMU_print_all_reg(void)
+{
+	fprintf(stdout, "EAX:%x\nEBX:%x\nECX:%x\nEDX:%x\nESI:%x\nEDI:%x\n",
+			PEMU_get_reg(XED_REG_EAX),
+			PEMU_get_reg(XED_REG_EBX),
+			PEMU_get_reg(XED_REG_ECX),
+			PEMU_get_reg(XED_REG_EDX),
+			PEMU_get_reg(XED_REG_ESI),
+			PEMU_get_reg(XED_REG_EDI));
 
 }

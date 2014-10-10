@@ -5,7 +5,7 @@
 //#define WINDOWS_FORMAT
 //#define WINDOWS_NAKED
 
-#define STATISTICS
+//#define STATISTICS
 //#define DEBUG
 
 #endif

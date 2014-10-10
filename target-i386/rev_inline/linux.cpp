@@ -30,6 +30,7 @@ extern "C"
 #include "../read_linux.h"
 
 #include <map>
+#include <unordered_set>
 using namespace std;
 
 uint32_t hookingpoint = 0;
@@ -65,6 +66,7 @@ uint32_t PEMU_img_start = 0;
 uint32_t PEMU_img_end = 0;
 uint32_t PEMU_txt_start = 0;
 uint32_t PEMU_txt_end = 0;
+uint32_t g_atexit;
 
 static map<unsigned int, Libc_item*> libc_map;
 
@@ -290,15 +292,9 @@ int PEMU_find_mmap(uint32_t nextaddr)
 
 			PEMU_txt_start = PEMU_img_start;
 			PEMU_txt_end = PEMU_img_end;
-#ifdef DEBUG
-			fprintf(stdout, "img:%x\t%x\t%s\n", PEMU_img_start, PEMU_img_end, comm);
-#endif
 		}
 		
 		if(!strcmp("libc-2.13.so", comm)){
-			//PEMU_libc_start = base;
-			//PEMU_libc_end = base + size;
-
 			if(PEMU_libc_start != 0)
 				PEMU_libc_start = (uint32_t)base < (uint32_t)PEMU_libc_start ? base : PEMU_libc_start;
 			else PEMU_libc_start = base;
@@ -314,6 +310,15 @@ int PEMU_find_mmap(uint32_t nextaddr)
 	return 1;
 }
 
+map<unsigned int, unordered_set<unsigned int> > injmp;
+
+
+void add_injmp(unsigned int start, unsigned int target)
+{
+	injmp[start].insert(target);
+}
+
+
 // Init libc_map
 void libc_init(void)
 {
@@ -323,7 +328,6 @@ void libc_init(void)
 	FILE *file = fopen("libc.so", "r");
 	if(!file){
 		fprintf(stderr, "can't find libc.so\n");
-		//return;
 		exit(0);
 	}
 
@@ -332,9 +336,6 @@ void libc_init(void)
 		memset(item, 0, sizeof(Libc_item));
 		strcpy(item->name, name);
 		libc_map[offset] = item;
-		
-		//fprintf(stdout, "%x\t%s\n", offset, name);	
-		//fflush(stdout);
 	}
 	fclose(file);
 }
@@ -411,11 +412,8 @@ void load_plt_info(void)
 
 		token = strtok(NULL, "\t");
 		strcpy(fname, token);
-		//fprintf(stderr, "%s\n", token);
 		token = strtok(NULL, "\t");//num
-		//fprintf(stderr, "%s\n", token);
 		token = strtok(NULL, "\t");
-		//fprintf(stderr, "%s\n", token);
 		
 		API_CALL *api = (API_CALL*)malloc(sizeof(API_CALL));
 		memset(api, 0, sizeof(API_CALL));
@@ -430,11 +428,15 @@ void load_plt_info(void)
 			if(!strcmp(type, "dptr")){
 				api->dptr |= 1 << (po-1);
 			}else if(!strcmp(type, "tplt")){
-				api->tptr != 1 << (po-1);
+				api->tptr |= 1 << (po-1);
 			}
 			token = strtok(NULL, "\t");
 		}
 
+		if(!strcmp(api->fname, "atexit")) {
+			g_atexit = addr;
+			return;
+		}
 		g_map_plt[addr] = api;
 #ifdef DEBUG
 		fprintf(stdout, "%x\t%s\t%x\t%x\n", addr, fname, api->dptr, api->tptr);

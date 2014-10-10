@@ -7,6 +7,11 @@
 extern xed_decoded_inst_t xedd_g;
 extern int xed_regmapping[][3];
 
+extern unsigned long g_base;
+extern unsigned long g_index;
+extern unsigned long g_disp;
+
+extern int find_min_dist(unsigned long, unsigned long, unsigned long, unsigned long);
 
 
 //typedef void (*DepFunc)(const xed_inst_t*);

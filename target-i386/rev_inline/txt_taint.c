@@ -50,6 +50,8 @@ static SecMap * ii_primary_map[PAGE_NUM];
 
 static unsigned int shadow_bytes;
 
+#undef DEBUG
+
 ///////////////////////////////////////////////////////////////////
 
 static void init_shadow_memory(void)
@@ -166,33 +168,18 @@ void t_set_reg_taint(xed_reg_enum_t reg, UInt bytes)
 #ifdef DEBUG
 	printf("set reg taint %s %x \n",xed_reg_enum_t2str(reg), bytes); 
 #endif
+}
 
-   //eax
-   /*
-	if(XED_REG_EAX == reg) {
-		regTaint[(UInt)XED_REG_AX]=bytes;
-		regTaint[(UInt)XED_REG_AH]=bytes;
-		regTaint[(UInt)XED_REG_AL]=bytes;
-    }
-    //ebx
-    else if(XED_REG_EBX == reg) {
-		regTaint[(UInt)XED_REG_BX]=bytes;
-		regTaint[(UInt)XED_REG_BH]=bytes;
-		regTaint[(UInt)XED_REG_BL]=bytes;
-	}
-    //ecx
-    else if(XED_REG_ECX == reg) {
-		regTaint[(UInt)XED_REG_CX]=bytes;
-		regTaint[(UInt)XED_REG_CH]=bytes;
-		regTaint[(UInt)XED_REG_CL]=bytes;
-	}
-    //edx
-	else if(XED_REG_EDX == reg) {
-		regTaint[(UInt)XED_REG_DX]=bytes;
-		regTaint[(UInt)XED_REG_DH]=bytes;
-		regTaint[(UInt)XED_REG_DL]=bytes;
-    }
-	*/
+
+void print_all_reg_txt(void)
+{
+	fprintf(stdout, "txt::EAX:%x\nEBX:%x\nECX:%x\nEDX:%x\nESI:%x\nEDI:%x\n",
+			t_get_reg_taint(XED_REG_EAX),
+			t_get_reg_taint(XED_REG_EBX),
+			t_get_reg_taint(XED_REG_ECX),
+			t_get_reg_taint(XED_REG_EDX),
+			t_get_reg_taint(XED_REG_ESI),
+			t_get_reg_taint(XED_REG_EDI));
 }
 
 

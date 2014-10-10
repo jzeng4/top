@@ -7,20 +7,17 @@ using namespace std;
 
 FUNCTION *g_current_func;
 PROGRAM *g_current_program;
-
-
+unsigned int g_current_esp;
 map<unsigned int, char> g_map_jmp;
+extern int g_atexit;
 
 typedef struct{
 	FUNCTION* func;
 	unsigned int ret_pc;
+    unsigned int esp;
 }ELEM;
 
-//stack<ELEM*> g_callstack;
 vector<ELEM*> g_callstack;
-
-//map<uint32_t, int> g_inst_count;
-
 
 extern "C"{
 INST *create_inst()
@@ -44,6 +41,9 @@ void insert_inst(unsigned int pc, unsigned char *inst, unsigned short len)
 {
 	if(g_current_func->count(pc))
 		return;
+	else if(g_atexit == pc) {
+		inst[0] = 0x90;
+	}
 
 	INST *tmp = create_inst();
 	memcpy(tmp->inst, inst, 15);
@@ -57,6 +57,11 @@ void insert_inst(unsigned int pc, unsigned char *inst, unsigned short len)
 void *get_current_func()
 {
 	return g_current_func;
+}
+
+unsigned int get_current_esp()
+{
+    return g_current_esp;
 }
 
 
@@ -122,14 +127,16 @@ void print_call_stack(){
 	}
 }
 
-void push_callstack(void *func, unsigned int ret)
+void push_callstack(void *func, unsigned int ret, unsigned int esp)
 {
 	ELEM *t = new ELEM;
 	t->func = (FUNCTION*)func;
 	t->ret_pc = ret;
+    t->esp  = esp;
 	//g_callstack.push(t);
 	g_callstack.push_back(t);
 	g_current_func = (FUNCTION*) func;
+    g_current_esp = t->esp;
 #ifdef DEBUG
 	print_call_stack();
 #endif
@@ -143,6 +150,7 @@ void pop_callstack()
 	//ELEM *p = g_callstack.top();
 	ELEM *p = g_callstack.back();
 	g_current_func = p->func;
+    g_current_esp = p->esp;
 #ifdef DEBUG
 	print_call_stack();	
 #endif
@@ -161,13 +169,16 @@ void create_program(unsigned int pc)
 	FUNCTION *tmp = create_func1(pc);
 	(*g_current_program)[pc] = tmp;
 	g_current_func = tmp;
-	push_callstack(tmp, 0);
+	push_callstack(tmp, 0, 0);
 }
 
 void insert_jmp_dst(unsigned int dst)
 {
 //	g_map_jmp[next] = 1;
 	g_map_jmp[dst] = 1;
+#ifdef DEBUG
+	fprintf(stdout, "Insert jmp target %x \n", dst);
+#endif
 }
 
 int get_jmp_dst(unsigned int dst)

@@ -13,6 +13,7 @@ typedef map<unsigned int, FUNCTION*> PROGRAM;
 
 extern FUNCTION *g_current_func;
 extern PROGRAM *g_current_program;
+extern unsigned int g_current_esp;
 
 extern "C"{
 #include <xed-interface.h>
@@ -27,7 +28,7 @@ extern "C"{
 	void insert_pc_imm(unsigned int, unsigned int);
 	unsigned int get_pc_imm(unsigned int);
 	void print_dependence_data();
-	void push_callstack(void *func, unsigned int ret);	
+	void push_callstack(void *func, unsigned int ret, unsigned int esp);
 	unsigned int get_ret_pc();
 	void pop_callstack();	
 	INST* get_inst(unsigned int pc);

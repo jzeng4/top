@@ -13,6 +13,9 @@ extern uint32_t g_symbol_nums;
 extern unsigned int g_imm_nums;
 extern unsigned int g_dis_nums;
 
+#undef DEBUG
+#undef STATISTICS
+
 //Hush.b
 typedef struct _Dst_item{
 	char name[100];
@@ -62,11 +65,11 @@ void patch_imm_operand(const xed_inst_t *xi)
 		op = xed_inst_operand(xi, i);
 		op_name = xed_operand_name(op);
 	
-		if(operand_is_imm(op_name, &value)){
+		if(operand_is_imm(op_name, &value)) {
 
 #ifdef STATISTICS
 		//statistics
-		if(value > 0x8000000 ){
+		if(value > 0x8000000 ) {
 			g_symbol_nums++;
 			g_imm_nums++;
 			fprintf(stderr, "imm num at pc\t%x\n", g_pc);
@@ -81,9 +84,6 @@ void patch_imm_operand(const xed_inst_t *xi)
 			sprintf(org_imm_str, "$0x%x", value);
 #endif
 
-#ifdef DEBUG
-			fprintf(stderr, "----imm num(0x%x) at pc\t%x\n", value, g_pc);
-#endif
 			char *tmp;
 			if(s_type == 1 || s_type == 4){
 #ifdef WINDOWS_FORMAT
@@ -121,11 +121,7 @@ void patch_imm_operand(const xed_inst_t *xi)
 			else{
 				tmp = replace(g_inst_str, org_imm_str, r_imm_str);
 				strcpy(g_inst_str, tmp);
-#ifdef DEBUG
-				fprintf(stderr, "----Replace %s with %s\n", g_inst_str, tmp);
-#endif
 			}
-//fprintf(stdout, "%s\t%s\t%s\n", org_imm_str, r_imm_str, g_inst_str);
 		}
 
 	}
@@ -144,7 +140,6 @@ void patch_displacement(const xed_inst_t *xi)
 		const xed_operand_t *op = xed_inst_operand(xi,i);
 		xed_operand_enum_t op_name = xed_operand_name(op);
 		if(operand_is_mem4(op_name, &mem_addr, i)){
-			fprintf(stderr, "----operand_is_mem4 %x(%d) is mem4\n", mem_addr, i);
 			int mem_idx = op_name == XED_OPERAND_MEM1 ? 1 : 0;
 			unsigned int displacement =
 				(unsigned int)

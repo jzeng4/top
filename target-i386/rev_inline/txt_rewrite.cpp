@@ -6,7 +6,9 @@ extern "C"{
 #include <stdio.h>
 #include "rev_inline/config.h"
 
+#undef DEBUG
 
+extern uint32_t mem_taint;
 static map<unsigned int, unsigned char> g_map_d_data;//store all global data
 static map<unsigned int, unsigned int> g_map_pc_imm;//store all imm value
 static map<unsigned int, short> g_map_pc_addr; //store value flags (1 for imm_data, 2 for imm_inst, 3 for displacement, 4 for 1 and 3, 5 for 2 and 3) for pc
@@ -20,37 +22,23 @@ extern "C"{
 
 //Hush.b
 void insert_mem_to_be_read(unsigned int memAddr, unsigned int size){
-	fprintf(stderr, "----mem_to_be_read insertion:%x(%d)\n", memAddr, size);
 	mem_to_be_read[memAddr]=size;
-	
-	/*
-	if(mem_to_be_read.empty())
-		mem_to_be_read.push_back(memAddr,size);
-	else if(std::find(mem_to_be_read.begin(), mem_to_be_read.end(), memAddr) != mem_to_be_read.end()) {
-	} else {
-		mem_to_be_read.push_back(memAddr);
-	}
-	*/
 }
 
 void update_mem_to_be_read(){
 	for(map<unsigned int, unsigned int>::iterator it=mem_to_be_read.begin();it!=mem_to_be_read.end();it++){
-		fprintf(stderr, "----mem_to_be_read updating: <%x, %d>\n", it->first, it->second);
 		for(int j=0;j<it->second;j++){
 			if(g_map_d_data.count(it->first+j)==0){
 				char fix;
 				if(PEMU_read_mem(it->first+j,1,&fix)==0){
-					fprintf(stderr, "----mem_to_be_read updating: (%x -- %x)\n", it->first+j, fix);
 					g_map_d_data[it->first+j]=fix;
-					mem_to_be_read.erase(it);
 				}else{
-					fprintf(stderr, "----mem_to_be_read cannot read: (%x)\n", it->first+j);
 					break;
 				}	
 			}
 		}
 	}
-
+    mem_to_be_read.clear();
 }
 //Hush.e
 
@@ -67,13 +55,13 @@ void insert_dependence_data(unsigned int addr, int size)
 			if(PEMU_read_mem(addr+i, 1, &byte)==0){
 				g_map_d_data[addr+i] = byte;
 #ifdef DEBUG
-			fprintf(stderr, "----global %x(size:%d): %x\n", addr+i,size, byte);
+//			fprintf(stderr, "----global %x(size:%d): %x\n", addr+i,size, byte);
 #endif
 			}
 			//Hush.b
 			//Hush.TODO
-			else{//Reading mem fail,  
-				//insert_mem_to_be_read(addr,size);
+			else {//Reading mem fail,  
+				insert_mem_to_be_read(addr,size);
 				//Temporarily set value as ZERO
 				g_map_d_data[addr+i]=0;
 				break;
@@ -97,12 +85,15 @@ unsigned int get_dependence_base()
 unsigned int dump_dependence_data(FILE *output)
 {
 	unsigned int next_addr = 0;
+    unsigned start;
 	fprintf(output, "char global_data [] = {");
 #ifdef WINDOWS_FORMAT
 	uint32_t col=0;
 #endif
 	map<unsigned int, unsigned char>::iterator it;
 	next_addr = g_map_d_data.begin()->first;
+    start =  next_addr;
+    fprintf(stderr, "##Global start %x\n", start);
 	for( it = g_map_d_data.begin(); it != g_map_d_data.end(); it++){
 		while(next_addr < it->first){
 			fprintf(output, "0x%x, ", 0);
@@ -114,6 +105,9 @@ unsigned int dump_dependence_data(FILE *output)
 #endif
 		}
 		fprintf(output, "0x%x, ", it->second);
+#ifdef DEBUG
+        fprintf(stderr, "global data %x %x %x\n", next_addr, next_addr- start, it->second);
+#endif
 		next_addr++;
 
 #ifdef WINDOWS_FORMAT
@@ -172,6 +166,9 @@ void insert_pc_addr(unsigned int pc, unsigned int type)
 			g_map_pc_addr[pc] = tmp + type;
 		return;
 	}
+#ifdef DEBUG
+	fprintf(stdout, "0x%x 0x%x\n", pc, g_pc);
+#endif
 	g_map_pc_addr[pc] = type;
 }
 
@@ -355,7 +352,25 @@ static void Instrument_LEA(const xed_inst_t* xi)
 
 			xed_reg_enum_t base_regid =
 				xed_decoded_inst_get_base_reg(&xedd_g, mem_idx);
-			t_set_reg_taint(reg_id, t_get_reg_taint(base_regid));
+			xed_reg_enum_t index_regid =
+			    xed_decoded_inst_get_index_reg(&xedd_g, mem_idx);
+            //if(index_regid == XED_REG_INVALID && mem_taint == 0)
+            //   t_set_reg_taint(reg_id, t_get_reg_taint(base_regid));
+			if(index_regid == XED_REG_INVALID) {
+				if(find_min_dist(mem_addr, g_base, g_index, g_disp) != 3) {
+					t_set_reg_taint(reg_id, t_get_reg_taint(base_regid));
+				}
+			}
+            else {
+                unsigned int a=0, b=0;
+                if(base_regid != XED_REG_INVALID)
+                    a = PEMU_get_reg(base_regid);
+                b = PEMU_get_reg(index_regid);
+                if( a < b)
+                    t_set_reg_taint(reg_id, t_get_reg_taint(index_regid));
+                else
+                    t_set_reg_taint(reg_id, t_get_reg_taint(base_regid));
+            }
 		}else{
 			fprintf(stderr, "error in Instrument_LEA\n");
 			exit(0);
@@ -464,6 +479,7 @@ REST:
 #ifdef DEBUG
 fprintf(stdout, "taint:\t%x\t%x\n", taint, dest);
 #endif
+	t_set_reg_taint(XED_REG_EAX, 0);
 	handle_api_issues(get_api_call(dest), 0);
 }
 
@@ -576,7 +592,6 @@ static void setup_txt_taint()
 
 
 
-extern uint32_t mem_taint;
 
 /*****************interface functions********************/
 void handle_txt_rewrite(const xed_inst_t* xi) {
@@ -596,7 +611,7 @@ void handle_txt_rewrite(const xed_inst_t* xi) {
 	xed_iclass_enum_t opcode = xed_decoded_inst_get_iclass(&xedd_g);
 
 	
-	noperands= noperands > 2 ? 2 : noperands;
+	noperands = noperands > 2 ? 2 : noperands;
 	for( i = 0; i < noperands ; i++){
 		/* Immediate */
 		op = xed_inst_operand(xi, i);
@@ -618,37 +633,60 @@ void handle_txt_rewrite(const xed_inst_t* xi) {
 
 			xed_reg_enum_t base_regid =
 				xed_decoded_inst_get_base_reg(&xedd_g, mem_idx);
+			xed_reg_enum_t index_regid =
+			    xed_decoded_inst_get_index_reg(&xedd_g, mem_idx);
 			displacement =
 				(unsigned int)
 			    xed_decoded_inst_get_memory_displacement(&xedd_g,
 								     mem_idx);
 
-				
-			if((base_regid != XED_REG_INVALID)){//indirect mem access
-				if((taint = t_get_reg_taint(base_regid)) && (mem_taint == 0)){//base reg
+#if 0				
+			if((base_regid != XED_REG_INVALID)) {//indirect mem access
+				if((taint = t_get_reg_taint(base_regid)) && (mem_taint == 0)) {//base reg
 					unsigned int imm = get_pc_imm(taint);
 					//yang
 					insert_pc_addr(taint, 1);
 					insert_dependence_data(mem_addr, xed_decoded_inst_operand_length(&xedd_g, i));
-					/*
-					if(imm <=mem_addr){
-						insert_pc_addr(taint, 1);
-						insert_dependence_data(imm, 
-								mem_addr + xed_decoded_inst_operand_length(&xedd_g, i) - imm);
-					}else{
-						insert_dependence_data(mem_addr, imm-mem_addr);
-					}*/
-				}else if(mem_taint != 0){ //displacement
+					
+				} else if(mem_taint != 0) { //displacement
 					insert_pc_addr(g_pc, 3);
 					insert_dependence_data(mem_addr, xed_decoded_inst_operand_length(&xedd_g, i));
 				}
-			}else if(displacement > 0){//displacement
+			} else if(index_regid != XED_REG_INVALID) {
+                if((taint = t_get_reg_taint(index_regid)) && (mem_taint ==0)) {
+					insert_pc_addr(taint, 1);
+					insert_dependence_data(mem_addr, xed_decoded_inst_operand_length(&xedd_g, i));
+                } else if(mem_taint != 0) {
+					insert_pc_addr(g_pc, 3);
+					insert_dependence_data(mem_addr, xed_decoded_inst_operand_length(&xedd_g, i));
+
+                }
+            } else if(displacement > 0) {//displacement
 				insert_dependence_data(displacement, 
 						mem_addr + xed_decoded_inst_operand_length(&xedd_g, i) - displacement);
 				insert_pc_addr(g_pc, 3);
-#ifdef DEBUG
-				fprintf(stderr, "----insert_pc_addr %x: %x 3\n", g_pc, displacement);
+			}
 #endif
+			switch(find_min_dist(mem_addr, g_base, g_index, g_disp)) {
+				case 1:
+					if(taint = t_get_reg_taint(base_regid)) {
+						insert_pc_addr(taint, 1);
+						insert_dependence_data(mem_addr, xed_decoded_inst_operand_length(&xedd_g, i));
+					}
+					break;
+				case 2:
+					if(taint = t_get_reg_taint(index_regid)) {
+						insert_pc_addr(taint, 1);
+						insert_dependence_data(mem_addr, xed_decoded_inst_operand_length(&xedd_g, i));
+					}
+					break;
+				case 3:
+					insert_dependence_data(displacement, 
+						mem_addr + xed_decoded_inst_operand_length(&xedd_g, i) - displacement);
+					insert_pc_addr(g_pc, 3);
+					break;
+				default:
+					break;
 			}
 		}
 	}
